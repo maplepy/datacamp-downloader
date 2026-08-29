@@ -6,8 +6,8 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "datacamp-downloader"
-version = "4.0.0"
+name = "datacamp-downloader-reborn"
+version = "4.0.1"
 description = "Download DataCamp course materials for personal use."
 readme = "README.md"
 requires-python = ">=3.10"

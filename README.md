@@ -39,7 +39,7 @@ arguments such as `intermediate-python`.
 ### From PyPI
 
 ```console
-python -m pip install datacamp-downloader
+python -m pip install datacamp-downloader-reborn
 ```
 
 ### From this checkout

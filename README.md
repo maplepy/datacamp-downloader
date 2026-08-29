@@ -85,7 +85,7 @@ Then restart the terminal.
 
 ## Documentation
 
-The available commands with full documentation can be found in [docs](https://github.com/TRoboto/datacamp-downloader/blob/master/docs.md)
+The available commands with full documentation can be found in [docs](https://github.com/maplepy/datacamp-downloader/blob/master/docs.md)
 
 ## Getting Started
 
@@ -215,7 +215,7 @@ datacamp download all-t
 
 This by default will download **videos**, **slides**, **datasets**, **exercises**, **english subtitles** and **transcripts** in organized folders in the **current directory**.
 
-To customize this behavior see `datacamp download` command in the [docs](https://github.com/TRoboto/datacamp-downloader/blob/master/docs.md).
+To customize this behavior see `datacamp download` command in the [docs](https://github.com/maplepy/datacamp-downloader/blob/master/docs.md).
 
 ## User Privacy
 

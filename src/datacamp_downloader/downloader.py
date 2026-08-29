@@ -51,7 +51,7 @@ def set_token(token: str = typer.Argument(...)):
 def tracks(
     refresh: Optional[bool] = typer.Option(
         False, "--refresh", "-r", is_flag=True, help="Refresh completed tracks."
-    )
+    ),
 ):
     """List your completed tracks."""
     datacamp.list_completed_tracks(refresh)
@@ -61,7 +61,7 @@ def tracks(
 def courses(
     refresh: Optional[bool] = typer.Option(
         False, "--refresh", "-r", is_flag=True, help="Refresh completed courses."
-    )
+    ),
 ):
     """List your completed courses."""
     datacamp.list_completed_courses(refresh)
@@ -71,7 +71,7 @@ def courses(
 def download(
     ids: List[str] = typer.Argument(
         ...,
-        help="IDs for courses/tracks to download or `all` to download all your completed courses or `all-t` to download all your completed tracks.",
+        help="IDs or slugs for courses/tracks, or `all`/`all-t` for completed courses/tracks.",
     ),
     path: Path = typer.Option(
         Path(os.getcwd() + "/Datacamp"),
@@ -142,7 +142,7 @@ def download(
         help="Overwrite files if exist.",
     ),
 ):
-    """Download courses/tracks given their ids.
+    """Download courses/tracks given their IDs or course slugs.
 
     Example: `datacamp download id1 id2 id3`\n
     To download all your completed courses run:

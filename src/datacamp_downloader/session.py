@@ -32,13 +32,24 @@ class Session:
     def save(self):
         self.datacamp.session = None
         self.datacamp.password = None
+        course_downloader = getattr(self.datacamp, "course_downloader", None)
+        if course_downloader:
+            course_downloader.session = None
         pickled = pickle.dumps(self.datacamp)
+        if course_downloader:
+            course_downloader.session = self
         self.savefile.write_bytes(pickled)
 
     def load_datacamp(self):
         if self.savefile.exists():
             datacamp = pickle.load(self.savefile.open("rb"))
             datacamp.session = self
+            if not hasattr(datacamp, "course_downloader"):
+                from .course_download import CourseDownloader
+
+                datacamp.course_downloader = CourseDownloader(self)
+            else:
+                datacamp.course_downloader.session = self
             return datacamp
         return Datacamp(self)
 

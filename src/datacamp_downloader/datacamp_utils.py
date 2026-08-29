@@ -1,5 +1,4 @@
 import re
-import sys
 from pathlib import Path
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
@@ -14,28 +13,20 @@ import datacamp_downloader.session as session
 
 from .constants import (
     COURSE_DETAILS_API,
-    EXERCISE_DETAILS_API,
-    LANGMAP,
     LOGIN_DETAILS_URL,
     LOGIN_URL,
     PROFILE_DATA_URL,
-    PROGRESS_API,
-    VIDEO_DETAILS_API,
 )
+from .course_download import CourseDownloader
 from .helper import (
     Logger,
     animate_wait,
     correct_path,
-    download_file,
     fix_track_link,
     get_table,
-    print_progress,
-    save_text,
 )
-from .templates.course import Chapter, Course
-from .templates.exercise import Exercise
+from .templates.course import Course
 from .templates.track import Track
-from .templates.video import Video
 
 
 def login_required(f):
@@ -74,6 +65,7 @@ def try_except_request(f):
 class Datacamp:
     def __init__(self, session: "session.Session") -> None:
         self.session = session
+        self.course_downloader = CourseDownloader(session)
         self.init()
 
     def init(self):
@@ -420,27 +412,9 @@ class Datacamp:
                 f"[{i}/{len(to_download)}] Start to download ({material.id}) {material.title}"
             )
             if isinstance(material, Course):
-                self.download_course(material, path, **kwargs)
+                self.course_downloader.download(material, path, **kwargs)
             else:
                 self.download_track(material, path, **kwargs)
-
-    def download_normal_exercise(
-        self, exercise: Exercise, path: Path, include_last_attempt: bool = False
-    ):
-        save_text(path, str(exercise), self.overwrite)
-        if include_last_attempt and exercise.is_python and exercise.last_attempt:
-            save_text(
-                path.parent / (path.name[:-3] + f".py"),
-                exercise.last_attempt,
-                self.overwrite,
-            )
-        subexs = exercise.data.subexercises
-        if subexs:
-            for i, subexercise in enumerate(subexs, 1):
-                exercise = self._get_exercise(subexercise)
-                self.download_normal_exercise(
-                    exercise, path.parent / (path.name[:-3] + f"_sub{i}.md")
-                )
 
     def download_track(self, track: Track, path: Path, **kwargs):
         path = path / correct_path(track.title)
@@ -448,104 +422,7 @@ class Datacamp:
             Logger.info(
                 f"[{i}/{len(track.courses)}] Download ({course.id}) {course.title} from ({track.title} Track)"
             )
-            self.download_course(course, path, f"{i}-", **kwargs)
-
-    def download_course(self, course: Course, path: Path, index="", **kwargs):
-        download_path = path / (
-            index + correct_path(course.slug or course.title.lower().replace(" ", "-"))
-        )
-        if kwargs.get("datasets") and course.datasets:
-            for i, dataset in enumerate(course.datasets, 1):
-                print_progress(i, len(course.datasets), f"datasets")
-                if dataset.asset_url:
-                    download_file(
-                        dataset.asset_url,
-                        download_path
-                        / "datasets"
-                        / correct_path(dataset.asset_url.split("/")[-1]),
-                        False,
-                        overwrite=self.overwrite,
-                    )
-            sys.stdout.write("\n")
-        for chapter in course.chapters:
-            cpath = download_path / self._get_chapter_name(chapter)
-            if kwargs.get("slides") and chapter.slides_link:
-                download_file(
-                    chapter.slides_link,
-                    cpath / correct_path(chapter.slides_link.split("/")[-1]),
-                    overwrite=self.overwrite,
-                )
-            if (
-                kwargs.get("exercises")
-                or kwargs.get("videos")
-                or kwargs.get("audios")
-                or kwargs.get("scripts")
-            ):
-                self.download_others(course.id, chapter, cpath, **kwargs)
-
-    def download_others(self, course_id, chapter: Chapter, path: Path, **kwargs):
-        exercises = kwargs.get("exercises")
-        videos = kwargs.get("videos")
-        audios = kwargs.get("audios")
-        scripts = kwargs.get("scripts")
-        subtitles = kwargs.get("subtitles")
-        last_attempt = kwargs.get("last_attempt")
-        ids = self._get_exercises_ids(course_id, chapter.id)
-        last_attempts = self.get_exercises_last_attempt(course_id, chapter.id)
-        exercise_counter = 1
-        video_counter = 1
-        for i, id in enumerate(ids, 1):
-            print_progress(i, len(ids), f"chapter {chapter.number}")
-            exercise = self._get_exercise(id)
-            exercise.last_attempt = last_attempts[id]
-            if not exercise:
-                continue
-            if exercises and not exercise.is_video:
-                self.download_normal_exercise(
-                    exercise,
-                    path / "exercises" / f"ex{exercise_counter}.md",
-                    last_attempt,
-                )
-                exercise_counter += 1
-            if exercise.is_video:
-                video = self._get_video(exercise.data.get("projector_key"))
-                if not video:
-                    continue
-                video_path = path / "videos" / f"ch{chapter.number}_{video_counter}"
-                if videos and video.video_mp4_link:
-                    download_file(
-                        video.video_mp4_link,
-                        video_path.with_suffix(".mp4"),
-                        overwrite=self.overwrite,
-                    )
-                if audios and video.audio_link:
-                    download_file(
-                        video.audio_link,
-                        path / "audios" / f"ch{chapter.number}_{video_counter}.mp3",
-                        False,
-                        overwrite=self.overwrite,
-                    )
-                if scripts and video.script_link:
-                    download_file(
-                        video.script_link,
-                        path / "scripts" / (video_path.name + "_script.md"),
-                        False,
-                        overwrite=self.overwrite,
-                    )
-                if subtitles and video.subtitles:
-                    for sub in subtitles:
-                        subtitle = self._get_subtitle(sub, video)
-                        if not subtitle:
-                            continue
-                        download_file(
-                            subtitle.link,
-                            video_path.parent / (video_path.name + f"_{sub}.vtt"),
-                            False,
-                            overwrite=self.overwrite,
-                        )
-                video_counter += 1
-            print_progress(i, len(ids), f"chapter {chapter.number}")
-        sys.stdout.write("\n")
+            self.course_downloader.download(course, path, f"{i}-", **kwargs)
 
     def get_completed_tracks(self, refresh=False):
         if self.tracks and not refresh:
@@ -610,18 +487,6 @@ class Datacamp:
             if course.order == order and course.id not in self.not_found_courses:
                 return course
 
-    @try_except_request
-    def get_exercises_last_attempt(self, course_id, chapter_id):
-        data = self.session.get_json(
-            PROGRESS_API.format(course_id=course_id, chapter_id=chapter_id)
-        )
-        if "error" in data:
-            raise ValueError(
-                f"Cannot get exercises for course {course_id}, chapter {chapter_id}."
-            )
-        last_attempt = {e["exercise_id"]: e["last_attempt"] for e in data}
-        return last_attempt
-
     def get_track(self, id):
         for track in self.tracks:
             if track.id == id:
@@ -641,15 +506,6 @@ class Datacamp:
             course = self.get_course(int(id))
             if course:
                 yield course
-
-    def _get_chapter_name(self, chapter: Chapter):
-        if chapter.title and chapter.title_meta:
-            return correct_path(chapter.slug)
-        if chapter.title:
-            return correct_path(
-                f"chapter-{chapter.number}-{chapter.title.replace(' ', '-').lower()}"
-            )
-        return f"chapter-{chapter.number}"
 
     def _set_profile(self):
         try:
@@ -680,45 +536,6 @@ class Datacamp:
         self.has_active_subscription = has_sub
 
         self.session.save()
-
-    def _get_subtitle(self, sub, video: Video):
-        if not LANGMAP.get(sub):
-            return
-        for subtitle in video.subtitles:
-            if subtitle.language == LANGMAP[sub]:
-                return subtitle
-
-    @try_except_request
-    def _get_video(self, id):
-        if not id:
-            raise ValueError("ID tag not found.")
-        res = self.session.get_json(VIDEO_DETAILS_API.format(hash=id))
-        if "error" in res:
-            raise ValueError()
-        return Video(**res)
-
-    @try_except_request
-    def _get_exercises_ids(self, course_id, chapter_id):
-        if not course_id or not chapter_id:
-            raise ValueError("ID tags not found.")
-        data = self.session.get_json(
-            PROGRESS_API.format(course_id=course_id, chapter_id=chapter_id)
-        )
-        if "error" in data:
-            raise ValueError(
-                f"Cannot get exercises for course {course_id}, chapter {chapter_id}."
-            )
-        ids = [e["exercise_id"] for e in data]
-        return ids
-
-    @try_except_request
-    def _get_exercise(self, id):
-        if not id:
-            raise ValueError("ID tag not found.")
-        res = self.session.get_json(EXERCISE_DETAILS_API.format(id=id))
-        if "error" in res:
-            raise ValueError(f"Cannot get exercise with id: {id}.")
-        return Exercise(**res)
 
     @try_except_request
     def _get_course(self, id):

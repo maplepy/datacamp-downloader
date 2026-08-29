@@ -1,4 +1,4 @@
-# DataCamp Downloader
+# DataCamp Downloader Reborn
 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![CLI](https://img.shields.io/badge/CLI-000000?style=for-the-badge&logo=gnubash&logoColor=white)
@@ -8,12 +8,12 @@
 ![Typer](https://img.shields.io/badge/Typer-009688?style=for-the-badge&logo=python&logoColor=white)
 ![MIT License](https://img.shields.io/badge/License-MIT-000000?style=for-the-badge)
 
-> A command-line tool for downloading and organizing DataCamp course materials.
+> A maintained command-line tool for downloading and organizing DataCamp course materials.
 
 ## Overview
 
-DataCamp Downloader is a command-line tool for downloading DataCamp course
-materials for personal use. It saves videos, slides, audio, exercises,
+DataCamp Downloader Reborn is a command-line tool for downloading DataCamp
+course materials for personal use. It saves videos, slides, audio, exercises,
 transcripts, datasets, and subtitles in an organized directory structure.
 
 This fork adds support for current ChromeDriver installations and course slug

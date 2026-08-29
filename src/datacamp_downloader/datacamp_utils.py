@@ -73,7 +73,6 @@ def try_except_request(f):
 
 class Datacamp:
     def __init__(self, session: "session.Session") -> None:
-
         self.session = session
         self.init()
 
@@ -90,7 +89,6 @@ class Datacamp:
         self.tracks = []
 
         self.not_found_courses = set()
-
 
     @animate_wait
     @try_except_request
@@ -133,10 +131,14 @@ class Datacamp:
         # Click the next/continue button (try a couple of selectors)
         try:
             try:
-                next_button = self.session.driver.find_element(By.XPATH, '//button[@tabindex="2"]')
+                next_button = self.session.driver.find_element(
+                    By.XPATH, '//button[@tabindex="2"]'
+                )
             except Exception:
                 # fallback: any submit button in a form
-                next_button = self.session.driver.find_element(By.CSS_SELECTOR, "button[type='submit'], input[type='submit']")
+                next_button = self.session.driver.find_element(
+                    By.CSS_SELECTOR, "button[type='submit'], input[type='submit']"
+                )
             next_button.click()
         except Exception as e:
             Logger.error(f"Cannot click next/continue button: {e}")
@@ -149,19 +151,39 @@ class Datacamp:
         # Wait for password input to be clickable
         try:
             wd = WebDriverWait(self.session.driver, 15)
-            password_field = wd.until(EC.element_to_be_clickable((By.ID, "user_password")))
+            password_field = wd.until(
+                EC.element_to_be_clickable((By.ID, "user_password"))
+            )
         except Exception as e:
-            Logger.error(f"Password field not found or not clickable (maybe SSO-only login?): {e}")
             try:
-                self.session.driver.save_screenshot("login_error_no_password.png")
+                password_field = self.session.driver.find_element(
+                    By.ID, "user_password"
+                )
+                self.session.driver.execute_script(
+                    """
+                    const field = arguments[0];
+                    const section = field.closest('.js-account-password-section');
+                    if (section) section.classList.remove('dc-is-hidden');
+                    field.removeAttribute('disabled');
+                    """,
+                    password_field,
+                )
             except Exception:
-                pass
-            return
+                Logger.error(
+                    f"Password field not found or not clickable (maybe SSO-only login?): {e}"
+                )
+                try:
+                    self.session.driver.save_screenshot("login_error_no_password.png")
+                except Exception:
+                    pass
+                return
 
         # Try to enter password robustly: ActionChains -> direct send_keys -> JS fallback
         try:
             # ActionChains to focus and type
-            ActionChains(self.session.driver).move_to_element(password_field).click().send_keys(password).perform()
+            ActionChains(self.session.driver).move_to_element(
+                password_field
+            ).click().send_keys(password).perform()
             Logger.info("Password typed via ActionChains")
         except Exception as e1:
             try:
@@ -171,10 +193,17 @@ class Datacamp:
             except Exception as e2:
                 # Last resort: set value via JS
                 try:
-                    self.session.driver.execute_script("arguments[0].value = arguments[1]; arguments[0].dispatchEvent(new Event('input'));", password_field, password)
+                    self.session.driver.execute_script(
+                        "arguments[0].value = arguments[1]; arguments[0].dispatchEvent(new Event('input'));",
+                        password_field,
+                        password,
+                    )
                     Logger.info("Password set via JS")
                 except Exception as e3:
-                    Logger.error("Cannot type password into the field. Details:\n" + "\n".join(map(str, [e1, e2, e3])))
+                    Logger.error(
+                        "Cannot type password into the field. Details:\n"
+                        + "\n".join(map(str, [e1, e2, e3]))
+                    )
                     try:
                         self.session.driver.save_screenshot("login_error_password.png")
                     except Exception:
@@ -185,7 +214,9 @@ class Datacamp:
         try:
             # Try to find the submit button
             try:
-                submit_button = self.session.driver.find_element(By.XPATH, '//input[@tabindex="4"]')
+                submit_button = self.session.driver.find_element(
+                    By.XPATH, '//input[@tabindex="4"]'
+                )
                 submit_button.click()
             except Exception:
                 # fallback: hit Enter on password field
@@ -203,7 +234,8 @@ class Datacamp:
         try:
             # wait for either the profile element, or error/flash messages
             WebDriverWait(self.session.driver, 10).until(
-                lambda d: "/users/sign_up" not in d.page_source and "Invalid" not in d.page_source
+                lambda d: "/users/sign_up" not in d.page_source
+                and "Invalid" not in d.page_source
             )
         except Exception:
             # Not a fatal error here, proceed to check token / page content
@@ -213,7 +245,9 @@ class Datacamp:
         try:
             token_cookie = self.session.driver.get_cookie("_dct")
             if not token_cookie:
-                Logger.error("Login did not produce a _dct cookie (likely login failed or SSO-only).")
+                Logger.error(
+                    "Login did not produce a _dct cookie (likely login failed or SSO-only)."
+                )
                 try:
                     self.session.driver.save_screenshot("login_no_token.png")
                 except Exception:
@@ -229,7 +263,6 @@ class Datacamp:
             except Exception:
                 pass
             return
-
 
     @animate_wait
     @try_except_request
@@ -312,7 +345,7 @@ class Datacamp:
         else:
             to_download = []
             for id in ids:
-                if "t" in id:
+                if id.startswith("t"):
                     track = self.get_track(id)
                     if not track:
                         Logger.warning(f"Track {id} is not fetched. Ignoring it.")
@@ -322,6 +355,52 @@ class Datacamp:
                     course = self.get_course_by_order(int(id))
                     if not course:
                         Logger.warning(f"Course {id} is not fetched. Ignoring it.")
+                        continue
+                    to_download.append(course)
+                else:
+                    if not self.courses:
+                        try:
+                            list(self.get_completed_courses())
+                        except Exception:
+                            pass
+                    course = next(
+                        (course for course in self.courses if course.slug == id),
+                        None,
+                    )
+                    if not course:
+                        try:
+                            profile = self.get_profile_data()
+                        except Exception:
+                            profile = {}
+                        match = next(
+                            (
+                                item
+                                for item in profile.get("enrolled_courses", [])
+                                if item.get("slug") == id
+                            ),
+                            None,
+                        )
+                        if match:
+                            course = self.get_course(match["id"])
+                    if not course:
+                        page = self.session.get(
+                            f"https://campus.datacamp.com/courses/{id}"
+                        )
+                        lesson = re.search(
+                            rf"/courses/{re.escape(id)}/([a-z0-9-]+)\?ex=1",
+                            page,
+                        )
+                        if lesson:
+                            lesson_page = self.session.get(
+                                f"https://campus.datacamp.com/courses/{id}/{lesson.group(1)}?ex=1"
+                            )
+                            course_id = re.search(
+                                r"course_(\d+)_[0-9a-f]{32}", lesson_page
+                            )
+                            if course_id:
+                                course = self.get_course(int(course_id.group(1)))
+                    if not course:
+                        Logger.warning(f"Course slug {id} was not found. Ignoring it.")
                         continue
                     to_download.append(course)
 
@@ -579,7 +658,10 @@ class Datacamp:
             Logger.error("Incorrect input token!")
             return
 
-        Logger.info("Hi, " + (data.get("first_name") or data.get("last_name") or data.get("email")))
+        Logger.info(
+            "Hi, "
+            + (data.get("first_name") or data.get("last_name") or data.get("email"))
+        )
 
         # New API: 'has_active_subscription' may not exist anymore
         has_sub = False
@@ -665,4 +747,3 @@ class Datacamp:
             chapters=res.get("chapters", []),
             time_needed=time_needed,
         )
-

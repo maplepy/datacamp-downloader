@@ -2,7 +2,7 @@ import json
 import os
 import pickle
 import json
-from webdriver_manager.chrome import ChromeDriverManager
+import shutil
 import re
 from bs4 import BeautifulSoup
 import os
@@ -34,6 +34,7 @@ class Session:
 
     def save(self):
         self.datacamp.session = None
+        self.datacamp.password = None
         pickled = pickle.dumps(self.datacamp)
         self.savefile.write_bytes(pickled)
 
@@ -81,7 +82,7 @@ class Session:
 
         # get the absolute path of the installed package
         package_dir = os.path.dirname(os.path.abspath(__file__))
-        
+
         # create a chrome profile folder inside the package directory
         profile_dir = os.path.join(package_dir, "dc_chrome_profile")
 
@@ -91,8 +92,9 @@ class Session:
         # tell Chrome to use it
         options.add_argument(f"--user-data-dir={profile_dir}")
 
-
-        service = ChromeService(executable_path=ChromeDriverManager().install())
+        # Prefer the system driver so webdriver-manager cannot select a stale version.
+        driver = shutil.which("chromedriver")
+        service = ChromeService(executable_path=driver) if driver else ChromeService()
         try:
             self.driver = uc.Chrome(service=service, options=options)
             return
@@ -122,8 +124,6 @@ class Session:
         self.bypass_cloudflare(url)
         return self.driver.page_source
 
-
-
     def get_json(self, url):
         page = self.get(url).strip()
 
@@ -137,7 +137,7 @@ class Session:
             page = page  # maybe raw JSON already
 
         # Debug
-        #print("\n\n[DEBUG get_json cleaned] First 200 chars:\n", page[:200], "\n\n")
+        # print("\n\n[DEBUG get_json cleaned] First 200 chars:\n", page[:200], "\n\n")
 
         return json.loads(page)
 

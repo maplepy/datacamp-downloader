@@ -1,6 +1,9 @@
 # DataCamp Downloader
 
 [![License](https://img.shields.io/github/license/maplepy/datacamp-downloader)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
+[![PyPI](https://img.shields.io/pypi/v/datacamp-downloader)](https://pypi.org/project/datacamp-downloader/)
+[![Build](https://img.shields.io/github/actions/workflow/status/maplepy/datacamp-downloader/release.yml?label=build)](https://github.com/maplepy/datacamp-downloader/actions)
 [![Documentation](https://img.shields.io/badge/docs-command_reference-informational)](docs.md)
 
 ## Overview

@@ -1,10 +1,14 @@
 # DataCamp Downloader
 
-[![License](https://img.shields.io/github/license/maplepy/datacamp-downloader)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
-[![PyPI](https://img.shields.io/pypi/v/datacamp-downloader)](https://pypi.org/project/datacamp-downloader/)
-[![Build](https://img.shields.io/github/actions/workflow/status/maplepy/datacamp-downloader/release.yml?label=build)](https://github.com/maplepy/datacamp-downloader/actions)
-[![Documentation](https://img.shields.io/badge/docs-command_reference-informational)](docs.md)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![CLI](https://img.shields.io/badge/CLI-000000?style=for-the-badge&logo=gnubash&logoColor=white)
+![DataCamp](https://img.shields.io/badge/DataCamp-03EF62?style=for-the-badge&logo=datacamp&logoColor=white)
+
+![Selenium](https://img.shields.io/badge/Selenium-43B02A?style=for-the-badge&logo=selenium&logoColor=white)
+![Typer](https://img.shields.io/badge/Typer-009688?style=for-the-badge&logo=python&logoColor=white)
+![MIT License](https://img.shields.io/badge/License-MIT-000000?style=for-the-badge)
+
+> A command-line tool for downloading and organizing DataCamp course materials.
 
 ## Overview
 

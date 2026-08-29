@@ -1,22 +1,22 @@
 # Datacamp Downloader
 
-[![GitHub license](https://img.shields.io/github/license/TRoboto/datacamp-downloader)](https://github.com/TRoboto/datacamp-downloader/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/maplepy/datacamp-downloader)](https://github.com/maplepy/datacamp-downloader/blob/master/LICENSE)
 [![PyPI version](https://badge.fury.io/py/datacamp-downloader.svg)](https://pypi.org/project/datacamp-downloader/)
-[![Documentation Status](https://readthedocs.org/projects/ansicolortags/badge/?version=latest)](https://github.com/TRoboto/datacamp-downloader/blob/master/docs.md)
+[![Documentation](https://img.shields.io/badge/docs-commands-informational)](https://github.com/maplepy/datacamp-downloader/blob/master/docs.md)
 
 [![Downloads](https://pepy.tech/badge/datacamp-downloader)](https://pepy.tech/project/datacamp-downloader)
-[![GitHub stars](https://img.shields.io/github/stars/TRoboto/datacamp-downloader)](https://github.com/TRoboto/datacamp-downloader/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/TRoboto/datacamp-downloader)](https://github.com/TRoboto/datacamp-downloader/network/members)
-[![GitHub contributors](https://img.shields.io/github/contributors/TRoboto/datacamp-downloader)](https://github.com/TRoboto/datacamp-downloader/graphs/contributors)
+[![GitHub stars](https://img.shields.io/github/stars/maplepy/datacamp-downloader)](https://github.com/maplepy/datacamp-downloader/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/maplepy/datacamp-downloader)](https://github.com/maplepy/datacamp-downloader/network/members)
+[![GitHub contributors](https://img.shields.io/github/contributors/maplepy/datacamp-downloader)](https://github.com/maplepy/datacamp-downloader/graphs/contributors)
 
 ## Table of Contents
 
 - [Datacamp Downloader](#datacamp-downloader)
   - [Table of Contents](#table-of-contents)
   - [Description](#description)
-  - [Installation](#installation)
-    - [PIP](#pip)
-    - [From source](#from-source)
+   - [Installation](#installation)
+     - [From PyPI](#from-pypi)
+     - [Run from this checkout](#run-from-this-checkout)
     - [Autocompletion](#autocompletion)
   - [Documentation](#documentation)
   - [Getting Started](#getting-started)
@@ -24,11 +24,6 @@
     - [Download](#download)
   - [User Privacy](#user-privacy)
   - [Disclaimer](#disclaimer)
-
-## Update
-
-Datacamp Downloader V3.2 is now available. The major change is that the tool now uses selenium for the backend. See changelog for version [3.0](https://github.com/TRoboto/datacamp-downloader/pull/39), [3.1](https://github.com/TRoboto/datacamp-downloader/pull/42)
-and [3.2](https://github.com/TRoboto/datacamp-downloader/pull/47).
 
 ## Description
 
@@ -46,7 +41,7 @@ If you find this CLI helpful, please support the developers by starring this rep
 
 ## Installation
 
-### PIP
+### From PyPI
 
 If you use pip, you can install datacamp-downloader with:
 
@@ -54,12 +49,26 @@ If you use pip, you can install datacamp-downloader with:
 pip install datacamp-downloader
 ```
 
-### From source
+### Run from this checkout
 
-You can directly clone this repo and install the tool with:
+Clone the repository, create a virtual environment, and install the local
+checkout in editable mode. This does not download the application from PyPI;
+changes to the source are used immediately:
 
+```console
+git clone https://github.com/maplepy/datacamp-downloader.git
+cd datacamp-downloader
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
+python -m datacamp_downloader --help
 ```
-pip install git+https://github.com/TRoboto/datacamp-downloader.git
+
+On Linux/macOS, you can also run directly from a checkout without an editable
+install after dependencies are available:
+
+```console
+PYTHONPATH=src python -m datacamp_downloader --help
 ```
 
 ### Autocompletion
@@ -184,6 +193,8 @@ Now, you can download any of the courses/tracks with:
 datacamp download id1 id2 id3
 ```
 
+Course slugs work too, for example `datacamp download intermediate-python`.
+
 For example to download the first and second course, run:
 
 ```
@@ -208,7 +219,9 @@ To customize this behavior see `datacamp download` command in the [docs](https:/
 
 ## User Privacy
 
-`datacamp` creates a session file with your credentials saved in the temp folder. If you no longer need to use the tool, it is preferable to reset the session, which will remove the saved file, with:
+`datacamp` creates a session file in the temp folder. It stores the token but
+clears the password before saving. If you no longer need to use the tool,
+remove the saved session with:
 
 ```
 datacamp reset
@@ -216,6 +229,6 @@ datacamp reset
 
 ## Disclaimer
 
-This CLI is provided to help you download Datacamp courses/tracks for personal use only. Sharing the content of the courses is strictly prohibited under [Datacamp's Terms of Use](https://www.datacamp.com/terms-of-use/).
+This CLI is provided to help you download DataCamp courses/tracks for personal use only. Sharing the content of the courses is strictly prohibited under [DataCamp's Terms of Use](https://www.datacamp.com/terms-of-use/).
 
 By using this CLI, the developers of this CLI are not responsible for any law infringement caused by the users of this CLI.

@@ -16,7 +16,7 @@ $ datacamp [OPTIONS] COMMAND [ARGS]...
 **Commands**:
 
 - `courses`: List your completed courses.
-- `download`: Download courses/tracks given their ids.
+- `download`: Download courses/tracks given their IDs or course slugs.
 - `login`: Log in to Datacamp using your username and password
 - `reset`: Restart the session.
 - `set-token`: Log in to Datacamp using your token.
@@ -88,9 +88,11 @@ $ datacamp tracks [OPTIONS]
 
 ## `datacamp download`
 
-Download courses/tracks given their ids.
+Download courses/tracks given their IDs or course slugs.
 
 Example: `datacamp download id1 id2 id3`
+
+Course slugs are also accepted: `datacamp download intermediate-python`
 
 To download all your completed courses run:
 `datacamp download all`

@@ -1,59 +1,44 @@
-# Datacamp Downloader
+# DataCamp Downloader
 
-[![GitHub license](https://img.shields.io/github/license/maplepy/datacamp-downloader)](https://github.com/maplepy/datacamp-downloader/blob/master/LICENSE)
-[![PyPI version](https://badge.fury.io/py/datacamp-downloader.svg)](https://pypi.org/project/datacamp-downloader/)
-[![Documentation](https://img.shields.io/badge/docs-commands-informational)](https://github.com/maplepy/datacamp-downloader/blob/master/docs.md)
+[![License](https://img.shields.io/github/license/maplepy/datacamp-downloader)](LICENSE)
+[![Documentation](https://img.shields.io/badge/docs-command_reference-informational)](docs.md)
 
-[![Downloads](https://pepy.tech/badge/datacamp-downloader)](https://pepy.tech/project/datacamp-downloader)
-[![GitHub stars](https://img.shields.io/github/stars/maplepy/datacamp-downloader)](https://github.com/maplepy/datacamp-downloader/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/maplepy/datacamp-downloader)](https://github.com/maplepy/datacamp-downloader/network/members)
-[![GitHub contributors](https://img.shields.io/github/contributors/maplepy/datacamp-downloader)](https://github.com/maplepy/datacamp-downloader/graphs/contributors)
+## Overview
 
-## Table of Contents
+DataCamp Downloader is a command-line tool for downloading DataCamp course
+materials for personal use. It saves videos, slides, audio, exercises,
+transcripts, datasets, and subtitles in an organized directory structure.
 
-- [Datacamp Downloader](#datacamp-downloader)
-  - [Table of Contents](#table-of-contents)
-  - [Description](#description)
-   - [Installation](#installation)
-     - [From PyPI](#from-pypi)
-     - [Run from this checkout](#run-from-this-checkout)
-    - [Autocompletion](#autocompletion)
-  - [Documentation](#documentation)
-  - [Getting Started](#getting-started)
-    - [Login](#login)
-    - [Download](#download)
-  - [User Privacy](#user-privacy)
-  - [Disclaimer](#disclaimer)
+This fork adds support for current ChromeDriver installations and course slug
+arguments such as `intermediate-python`.
 
-## Description
+## Features
 
-Datacamp Downloader is a command-line interface tool developed in Python
-in order to help you download your completed contents on [Datacamp](https://datacamp.com)
-and keep them locally on your computer.
+- Download completed courses and tracks by ID.
+- Download courses by slug, for example `intermediate-python`.
+- Download videos, slides, audio, exercises, scripts, datasets, and subtitles.
+- Resume downloads without overwriting existing files.
+- Run directly from a local checkout or through the `datacamp` command.
 
-Datacamp Downloader helps you download all videos, slides, audios, exercises, transcripts, datasets and subtitles in organized folders.
+## Prerequisites
 
-The design and development of this tool was inspired by [udacimak](https://github.com/udacimak/udacimak)
-
-**Datacampers!**
-
-If you find this CLI helpful, please support the developers by starring this repository.
+- Python 3.10 or newer.
+- Google Chrome or Chromium.
+- A matching `chromedriver` on `PATH`, or a Selenium-compatible driver setup.
+- A DataCamp account with access to the courses you download.
 
 ## Installation
 
 ### From PyPI
 
-If you use pip, you can install datacamp-downloader with:
-
-```
-pip install datacamp-downloader
+```console
+python -m pip install datacamp-downloader
 ```
 
-### Run from this checkout
+### From this checkout
 
-Clone the repository, create a virtual environment, and install the local
-checkout in editable mode. This does not download the application from PyPI;
-changes to the source are used immediately:
+This installs the local source in editable mode. It does not download the
+application from PyPI:
 
 ```console
 git clone https://github.com/maplepy/datacamp-downloader.git
@@ -61,174 +46,96 @@ cd datacamp-downloader
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e .
+```
+
+On Windows PowerShell, activate the environment with:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+## Usage
+
+After installation, use either the installed command or the Python module:
+
+```console
+datacamp --help
 python -m datacamp_downloader --help
 ```
 
-On Linux/macOS, you can also run directly from a checkout without an editable
-install after dependencies are available:
+To run directly from a checkout without an editable install, make the `src`
+directory importable:
 
 ```console
 PYTHONPATH=src python -m datacamp_downloader --help
 ```
 
-### Autocompletion
+Log in with credentials:
 
-To allow command autocompletion with `[TAB][TAB]`, run:
-
-```
-datacamp --install-completion [bash|zsh|fish|powershell|pwsh]
-```
-
-Then restart the terminal.
-
-**Note:** autocompletion might not be supported by all operating systems.
-
-## Documentation
-
-The available commands with full documentation can be found in [docs](https://github.com/maplepy/datacamp-downloader/blob/master/docs.md)
-
-## Getting Started
-
-### Login
-
-- To login using your username or password, run:
-
-```
-datacamp login -u [USERNAME] -p [PASSWORD]
-```
-
-or simply run:
-
-```
+```console
 datacamp login
 ```
 
-- To login using Datacamp authentication token, run:
+Or set the `_dct` authentication token from your browser cookies:
 
-```
-datacamp set-token [TOKEN]
-```
-
-Datacamp authentication token can be found in Datacamp website browser _cookies_.
-To get your Datacamp authentication, follow these steps:
-
-**Firefox**
-
-1. Visit [datacamp.com](https://datacamp.com) and log in.
-2. Open the **Developer Tools** (press `Cmd + Opt + J` on MacOS or `F12` on Windows).
-3. Go to **Storage tab**, then **Cookies** > `https://www.datacamp.com`
-4. Find `_dct` key, its **Value** is the Datacamp authentication token.
-
-**Chrome**
-
-1. Visit [datacamp.com](https://datacamp.com) and log in.
-2. Open the **Developer Tools** (press `Cmd + Opt + J` on MacOS or `F12` on Windows).
-3. Go to **Application tab**, then **Storage** > **Cookies** > `https://www.datacamp.com`
-4. Find `_dct` key, its **Value** is the Datacamp authentication token.
-
----
-
-**Security Note**
-
-Datacamp authentication token is a secret key and is unique to you. **You should not share it publicly**.
-
----
-
-If you provided valid credentials, you should see the following:
-
-```
-Hi, YOUR_NAME
-Active subscription found
+```console
+datacamp set-token YOUR_TOKEN
 ```
 
-> Active subscription is not required anymore.
+Never share the token. It is a secret that grants access to your DataCamp
+account.
 
-### Download
+List available completed courses and tracks:
 
-First, you should list your completed courses/track.
-
-To list your completed **courses**, run:
-
-```
+```console
 datacamp courses
-```
-
-To list your completed **tracks**, run:
-
-```
 datacamp tracks
 ```
 
-Similar output to this should appear with your completed courses/tracks:
+Download by numeric ID, slug, or the special collection names:
 
-```
-+--------+------------------------------------------+------------+------------+------------+
-| ID     | Title                                    | Datasets   | Exercises  | Videos     |
-+--------+------------------------------------------+------------+------------+------------+
-| 1      | Introduction to Python                   | 2          | 46         | 11         |
-+--------+------------------------------------------+------------+------------+------------+
-| 2      | Introduction to SQL                      | 1          | 40         | 1          |
-+--------+------------------------------------------+------------+------------+------------+
-| 3      | Intermediate Python                      | 3          | 69         | 18         |
-+--------+------------------------------------------+------------+------------+------------+
-| 4      | Introduction to Data Science in Python   | 0          | 31         | 13         |
-+--------+------------------------------------------+------------+------------+------------+
-| 5      | Data Science for Everyone                | 0          | 33         | 15         |
-+--------+------------------------------------------+------------+------------+------------+
-| 6      | Joining Data in SQL                      | 3          | 40         | 13         |
-+--------+------------------------------------------+------------+------------+------------+
-| 7      | Data Manipulation with pandas            | 4          | 41         | 15         |
-+--------+------------------------------------------+------------+------------+------------+
-| 8      | Supervised Learning with scikit-learn    | 7          | 37         | 17         |
-+--------+------------------------------------------+------------+------------+------------+
-| 9      | Machine Learning for Everyone            | 0          | 25         | 12         |
-+--------+------------------------------------------+------------+------------+------------+
-| 10     | Python Data Science Toolbox (Part 1)     | 1          | 34         | 12         |
-+--------+------------------------------------------+------------+------------+------------+
-```
-
-Now, you can download any of the courses/tracks with:
-
-```
-datacamp download id1 id2 id3
-```
-
-Course slugs work too, for example `datacamp download intermediate-python`.
-
-For example to download the first and second course, run:
-
-```
-datacamp download 1 2
-```
-
-- To download all your completed courses, run:
-
-```
+```console
+datacamp download 1
+datacamp download intermediate-python
 datacamp download all
-```
-
-- To download all your completed tracks, run:
-
-```
 datacamp download all-t
 ```
 
-This by default will download **videos**, **slides**, **datasets**, **exercises**, **english subtitles** and **transcripts** in organized folders in the **current directory**.
+See [docs.md](docs.md) for all download options.
 
-To customize this behavior see `datacamp download` command in the [docs](https://github.com/maplepy/datacamp-downloader/blob/master/docs.md).
+## Structure
 
-## User Privacy
-
-`datacamp` creates a session file in the temp folder. It stores the token but
-clears the password before saving. If you no longer need to use the tool,
-remove the saved session with:
-
+```text
+.
+├── pyproject.toml                 # Package metadata and dependencies
+├── README.md                      # Project documentation
+├── docs.md                        # CLI command reference
+├── .github/workflows/release.yml  # PyPI release workflow
+└── src/
+    └── datacamp_downloader/       # Importable Python package
+        ├── __main__.py            # `python -m datacamp_downloader`
+        ├── downloader.py          # CLI commands
+        ├── datacamp_utils.py      # DataCamp API and download logic
+        ├── session.py             # Browser session handling
+        ├── helper.py              # Output and file helpers
+        └── templates/             # Downloaded-content models
 ```
-datacamp reset
-```
 
-## Disclaimer
+The `src` directory is a source root. The nested `datacamp_downloader`
+directory is the actual Python package, which is the conventional layout for
+modern Python projects and prevents accidental imports from the repository
+root.
 
-This CLI is provided to help you download DataCamp courses/tracks for personal use only. Sharing the content of the courses is strictly prohibited under [DataCamp's Terms of Use](https://www.datacamp.com/terms-of-use/).
+## Contributing
 
-By using this CLI, the developers of this CLI are not responsible for any law infringement caused by the users of this CLI.
+1. Create a branch for your change.
+2. Run `python -m compileall -q src` and the CLI help command.
+3. Update documentation when command behavior changes.
+4. Open a pull request with a concise description and verification steps.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
+
+Use the downloader only for content you are authorized to access, and follow
+DataCamp's [Terms of Use](https://www.datacamp.com/terms-of-use/).

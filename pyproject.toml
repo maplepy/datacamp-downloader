@@ -16,6 +16,7 @@ authors = [
     { name = "Mohammad Al-Fetyani", email = "m4bh@hotmail.com" },
 ]
 dependencies = [
+    "setuptools>=68.0.0",
     "beautifulsoup4==4.13.5",
     "requests==2.32.5",
     "selenium==4.35.0",

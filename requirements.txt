@@ -2,7 +2,6 @@ beautifulsoup4==4.13.5
 requests==2.32.5
 selenium==4.35.0
 undetected-chromedriver==3.2.1
-webdriver-manager==4.0.2
 texttable==1.6.3
 termcolor==1.1.0
 colorama==0.4.4

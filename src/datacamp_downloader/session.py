@@ -1,11 +1,8 @@
 import json
 import os
 import pickle
-import json
 import shutil
-import re
 from bs4 import BeautifulSoup
-import os
 from pathlib import Path
 
 # Prefer top-level undetected_chromedriver (works with Selenium 4); fallback to v2.
@@ -48,7 +45,7 @@ class Session:
     def reset(self):
         try:
             os.remove(SESSION_FILE)
-        except:
+        except FileNotFoundError:
             pass
 
     def _setup_driver(self, headless=True):

@@ -55,7 +55,7 @@ def animate_wait(f):
     done = False
 
     def animate():
-        for c in itertools.cycle(list("/—\|")):
+        for c in itertools.cycle(list(r"/—\|")):
             if done:
                 Logger.clear()
                 break
@@ -92,7 +92,7 @@ def download_file(link: str, path: Path, progress=True, max_retry=10, overwrite=
             i = -1
             break
         except Exception:
-            Logger.print(f"", f"Retry [{i+1}/{max_retry}]", "magenta", end="")
+            Logger.print("", f"Retry [{i + 1}/{max_retry}]", "magenta", end="")
 
     if i != -1:
         Logger.error(f"Failed to download {link}")
@@ -128,9 +128,6 @@ def print_progress(progress, total, name, max=50):
 
 
 def save_text(path: Path, content: str, overwrite=False):
-    if not path.is_file:
-        Logger.error(f"{path.absolute()} isn't a file")
-        return
     if not overwrite and path.exists():
         Logger.warning(f"{path.absolute()} is already downloaded")
         return
